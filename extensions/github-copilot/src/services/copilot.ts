@@ -221,7 +221,7 @@ const fetchTasks = async (): Promise<TaskWithPullRequest[]> => {
   };
 
   const [listTasksResponse, listSessionsResponse] = await Promise.all([
-    fetch("https://api.githubcopilot.com/agents/tasks?sort=last_updated_at,desc", { headers }),
+    fetch("https://api.githubcopilot.com/agents/tasks?sort=updated_at,desc", { headers }),
     fetch("https://api.githubcopilot.com/agents/sessions", { headers }),
   ]);
 
