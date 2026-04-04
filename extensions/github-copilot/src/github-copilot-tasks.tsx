@@ -1,8 +1,8 @@
 import { Color, MenuBarExtra, open } from "@raycast/api";
 import { useTasks } from "./hooks/useTasks";
-import { useMemo } from "react";
+import { useMemo, useState, useEffect } from "react";
 import { withAccessToken } from "@raycast/utils";
-import { provider } from "./lib/oauth";
+import { client, provider } from "./lib/oauth";
 import { getTaskIcon, getMenuBarShortcut, truncate } from "./utils";
 
 function Command() {
@@ -56,4 +56,28 @@ function Command() {
   );
 }
 
-export default withAccessToken(provider)(Command);
+const AuthenticatedCommand = withAccessToken(provider)(Command);
+
+// Wrap the menu bar command so it only renders (and triggers auth) when a token
+// already exists. This prevents the background 30-minute refresh from starting
+// a new OAuth flow that would overwrite the PKCE state stored by an interactive
+// command mid-authentication, causing an "OAuth State Mismatch" error.
+export default function MenuBarCommand() {
+  const [isAuthenticated, setIsAuthenticated] = useState<boolean | undefined>(undefined);
+
+  useEffect(() => {
+    let isMounted = true;
+    client.getTokens().then((tokenSet) => {
+      if (isMounted) {
+        setIsAuthenticated(!!tokenSet?.accessToken);
+      }
+    });
+    return () => {
+      isMounted = false;
+    };
+  }, []);
+
+  if (isAuthenticated !== true) return null;
+
+  return <AuthenticatedCommand />;
+}

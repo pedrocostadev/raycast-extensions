@@ -1,5 +1,9 @@
 # GitHub Copilot Changelog
 
+## [Fix OAuth State Mismatch] - {PR_MERGE_DATE}
+
+- Fix "OAuth State Mismatch" error during login caused by the menu bar command triggering a competing OAuth flow in the background while the user was already authenticating via an interactive command
+
 ## [View live agent logs] - 2026-03-17
 
 - Allow viewing the live agent logs for a task with the "View Tasks" command
